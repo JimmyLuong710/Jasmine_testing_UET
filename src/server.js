@@ -1,13 +1,30 @@
-const express = require('express');
+const express = require("express");
+const userRouter = require('./routes/user.route')
 
-const app = express();
+class Server {
+  port = 3000;
+  server;
+  app = express();
 
-app.get("/users", (req, res) => {
-    console.log('hello bro')
-    res.json('this is list of tasks')
-})
+  constructor() {
+    this.app.use(express.json())
+    this.app.use(userRouter)
+    this.app.use('*', (req, res) => {
+      res.status(404).json('API not found')
+    })
+  }
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+  start() {
+    this.server = this.app.listen(this.port, () => {
+      console.log(`Server running at http://localhost:${this.port}`);
+    });
+  }
+
+  shutdown() {
+    this.server.close(() => {
+      console.log("Closed server on port", this.port);
+    });
+  }
+}
+
+module.exports = Server;
