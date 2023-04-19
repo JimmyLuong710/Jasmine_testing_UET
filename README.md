@@ -1,3 +1,4 @@
+# All file tests are inside folder spec
 # First, install packages used in app
 npm install
 
