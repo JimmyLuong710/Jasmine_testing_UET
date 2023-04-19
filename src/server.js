@@ -1,5 +1,6 @@
 const express = require("express");
-const userRouter = require('./routes/user.route')
+const userRouter = require("./routes/user.route");
+const taskRouter = require("./routes/task.route");
 
 class Server {
   port = 3000;
@@ -7,11 +8,12 @@ class Server {
   app = express();
 
   constructor() {
-    this.app.use(express.json())
-    this.app.use(userRouter)
-    this.app.use('*', (req, res) => {
-      res.status(404).json('API not found')
-    })
+    this.app.use(express.json());
+    this.app.use(userRouter);
+    this.app.use(taskRouter);
+    this.app.use("*", (req, res) => {
+      res.status(404).json("API not found");
+    });
   }
 
   start() {

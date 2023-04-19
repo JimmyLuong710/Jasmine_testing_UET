@@ -1,5 +1,7 @@
 const request = require("request");
 
+const BACKEND_URL = "http://localhost:3000";
+
 describe("RESTful API Test with user route", function () {
   const App = require("../src/server");
   const server = new App();
@@ -13,7 +15,7 @@ describe("RESTful API Test with user route", function () {
 
   describe("GET /users", function () {
     it("should return a list of users", function (done) {
-      request.get("http://localhost:3000/users", function (err, res, body) {
+      request.get(`${BACKEND_URL}/users`, function (err, res, body) {
         expect(res.statusCode).toBe(200);
         expect(JSON.parse(body).length).toBeGreaterThan(0);
         done();
@@ -21,7 +23,7 @@ describe("RESTful API Test with user route", function () {
     });
 
     it("should return user with valid userId: 1", function (done) {
-      request.get("http://localhost:3000/users/1", function (err, res, body) {
+      request.get(`${BACKEND_URL}/users/1`, function (err, res, body) {
         const user = JSON.parse(body);
         expect(res.statusCode).toBe(200);
         expect(parseInt(user.id)).toBe(1);
@@ -32,12 +34,11 @@ describe("RESTful API Test with user route", function () {
     });
 
     it("should return 404 for invalid userIds: -1 and 999", function (done) {
-      request.get("http://localhost:3000/users/999", function (err, res, body) {
+      request.get(`${BACKEND_URL}/users/999`, function (err, res, body) {
         expect(res.statusCode).toBe(404);
-        done();
       });
 
-      request.get("http://localhost:3000/users/-1", function (err, res, body) {
+      request.get(`${BACKEND_URL}/users/-1`, function (err, res, body) {
         expect(res.statusCode).toBe(404);
         done();
       });
@@ -53,7 +54,7 @@ describe("RESTful API Test with user route", function () {
       };
       request.post(
         {
-          url: "http://localhost:3000/users",
+          url: `${BACKEND_URL}/users`,
           body: newUser,
           json: true,
         },

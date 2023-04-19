@@ -1,53 +1,46 @@
-const request = require('request');
-const app = require('../app');
-const mongoose = require('mongoose');
-const User = require('../models/user');
+const request = require("request");
+const mongoose = require("mongoose");
+const Task = require("../src/models/task.model");
 
-const MONGODB_URL = "mongodb://localhost:27017/jasmine_testing"
+const MONGODB_URL = "mongodb://localhost:27017/jasmine_testing";
+const BACKEND_URL = "http://localhost:3000";
 
-describe('Test user API', () => {
-  let server;
+describe("Test task API", () => {
+  const App = require("../src/server");
+  const server = new App();
 
-  beforeAll((done) => {
-    server = app.listen(4000, () => {
-      mongoose.connect(process.env.MONGODB_URL);
-      done();
-    });
+  beforeAll(async () => {
+    server.start();
+    await mongoose.connect(MONGODB_URL);
   });
 
-  afterAll((done) => {
+  afterAll(() => {
     mongoose.connection.close();
-    server.close(done);
+    server.shutdown();
   });
 
   beforeEach(async () => {
-    await User.deleteMany({});
+    await Task.deleteMany({});
   });
 
-  test('Create a new user', async () => {
-    const newUser = {
-      name: 'John Doe',
-      email: 'johndoe@example.com',
-      password: '123456',
+  it("Create a new task", function (done) {
+    const newTask = {
+      title: "Deadline testing with tool jasmine",
+      description: "This is the first test",
     };
 
     const options = {
-      method: 'POST',
-      uri: 'http://localhost:4000/users',
-      body: newUser,
+      uri: `${BACKEND_URL}/tasks`,
+      body: newTask,
       json: true,
     };
+    request.post(options, async (err, res, body) => {
+      const task = await Task.findOne({ title: newTask.title });
 
-    request(options, async (error, response, body) => {
-      expect(response.statusCode).toBe(201);
-      expect(body.name).toBe(newUser.name);
-      expect(body.email).toBe(newUser.email);
-
-      const user = await User.findOne({ email: newUser.email });
-
-      expect(user).toBeDefined();
-      expect(user.name).toBe(newUser.name);
-      expect(user.email).toBe(newUser.email);
+      expect(task).toBeDefined();
+      expect(task.title).toBe(newTask.title);
+      expect(task.description).toBe(newTask.description);
+      done();
     });
   });
 });
